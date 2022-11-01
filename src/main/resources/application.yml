@@ -1,0 +1,12 @@
+spring:
+  mail:
+    host: localhost
+    port: 1025
+  thymeleaf:
+    mode: HTML
+
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+    username: sa
+    password:
+
