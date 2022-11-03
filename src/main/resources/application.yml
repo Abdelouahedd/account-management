@@ -4,9 +4,17 @@ spring:
     port: 1025
   thymeleaf:
     mode: HTML
-
-  r2dbc:
-    url: r2dbc:h2:mem:///testdb
+    cache: false
+  datasource:
+    url: 'jdbc:h2:mem:account-management'
     username: sa
-    password:
+    password: sa
+  jpa:
+    hibernate:
+      ddl-auto: 'create-drop'
+    show-sql: true
 
+  messages:
+    basename: i18n/messages
+    cache-duration: PT1S
+    encoding: UTF-8
