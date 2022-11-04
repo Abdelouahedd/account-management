@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
+@Service
 public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
@@ -75,7 +77,7 @@ public class UserService {
 
   public User registerUser(AdminUserDTO userDTO, String password) {
     userRepository
-      .findByLogin(userDTO.login().toLowerCase())
+      .findByLogin(userDTO.getLogin().toLowerCase())
       .ifPresent(existingUser -> {
         boolean removed = removeNonActivatedUser(existingUser);
         if (!removed) {
@@ -83,7 +85,7 @@ public class UserService {
         }
       });
     userRepository
-      .findByEmailIgnoreCase(userDTO.email())
+      .findByEmailIgnoreCase(userDTO.getEmail())
       .ifPresent(existingUser -> {
         boolean removed = removeNonActivatedUser(existingUser);
         if (!removed) {
@@ -92,15 +94,15 @@ public class UserService {
       });
     User newUser = new User();
     String encryptedPassword = passwordEncoder.encode(password);
-    newUser.setLogin(userDTO.login().toLowerCase());
+    newUser.setLogin(userDTO.getLogin().toLowerCase());
     // new user gets initially a generated password
     newUser.setPassword(encryptedPassword);
-    newUser.setFirstName(userDTO.firstName());
-    newUser.setLastName(userDTO.lastName());
-    if (userDTO.email() != null) {
-      newUser.setEmail(userDTO.email().toLowerCase());
+    newUser.setFirstName(userDTO.getFirstName());
+    newUser.setLastName(userDTO.getLastName());
+    if (userDTO.getEmail() != null) {
+      newUser.setEmail(userDTO.getEmail().toLowerCase());
     }
-    newUser.setLangKey(userDTO.langKey());
+    newUser.setLangKey(userDTO.getLangKey());
     // new user is not active
     newUser.setActivated(false);
     // new user gets registration key
@@ -125,25 +127,25 @@ public class UserService {
 
   public User createUser(AdminUserDTO userDTO) {
     User user = new User();
-    user.setLogin(userDTO.login().toLowerCase());
-    user.setFirstName(userDTO.firstName());
-    user.setLastName(userDTO.lastName());
-    if (userDTO.email() != null) {
-      user.setEmail(userDTO.email().toLowerCase());
+    user.setLogin(userDTO.getLogin().toLowerCase());
+    user.setFirstName(userDTO.getFirstName());
+    user.setLastName(userDTO.getLastName());
+    if (userDTO.getEmail() != null) {
+      user.setEmail(userDTO.getEmail().toLowerCase());
     }
-    if (userDTO.lastModifiedBy() == null) {
+    if (userDTO.getLangKey() == null) {
       user.setLangKey(Constants.DEFAULT_LANGUAGE); // default language
     } else {
-      user.setLangKey(userDTO.langKey());
+      user.setLangKey(userDTO.getLangKey());
     }
     String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
     user.setPassword(encryptedPassword);
     user.setResetKey(RandomUtil.generateResetKey());
     user.setResetDate(Instant.now());
     user.setActivated(true);
-    if (userDTO.authorities() != null) {
+    if (userDTO.getAuthorities() != null) {
       Set<Authority> authorities = userDTO
-        .authorities()
+        .getAuthorities()
         .stream()
         .map(authorityRepository::findByName)
         .filter(Optional::isPresent)
@@ -164,22 +166,22 @@ public class UserService {
    */
   public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
     return Optional
-      .of(userRepository.findById(userDTO.id()))
+      .of(userRepository.findById(userDTO.getId()))
       .filter(Optional::isPresent)
       .map(Optional::get)
       .map(user -> {
-        user.setLogin(userDTO.login().toLowerCase());
-        user.setFirstName(userDTO.firstName());
-        user.setLastName(userDTO.lastName());
-        if (userDTO.email() != null) {
-          user.setEmail(userDTO.email().toLowerCase());
+        user.setLogin(userDTO.getLogin().toLowerCase());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        if (userDTO.getEmail() != null) {
+          user.setEmail(userDTO.getEmail().toLowerCase());
         }
-        user.setActivated(userDTO.activated());
-        user.setLangKey(userDTO.langKey());
+        user.setActivated(userDTO.isActivated());
+        user.setLangKey(userDTO.getLangKey());
         Set<Authority> managedAuthorities = user.getAuthorities();
         managedAuthorities.clear();
         userDTO
-          .authorities()
+          .getAuthorities()
           .stream()
           .map(authorityRepository::findByName)
           .filter(Optional::isPresent)

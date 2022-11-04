@@ -1,48 +1,74 @@
 package org.ae.account.management.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.ae.account.management.domain.Authority;
 import org.ae.account.management.domain.User;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record AdminUserDTO(
-  Long id,
+@Getter
+@Setter
+public class AdminUserDTO implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  private Long id;
+
   @NotBlank
   @Size(min = 1, max = 50)
-  String login,
+  private String login;
+
   @Size(max = 50)
-  String firstName,
+  private String firstName;
+
   @Size(max = 50)
-  String lastName,
+  private String lastName;
+
   @Email
   @Size(min = 5, max = 254)
-  String email,
-  boolean activated,
+  private String email;
+
+  @Size(max = 256)
+  private String imageUrl;
+
+  private boolean activated = false;
+
   @Size(min = 2, max = 10)
-  String langKey,
-  String createdBy,
-  Instant createdDate,
-  String lastModifiedBy,
-  Instant lastModifiedDate,
-  Set<String> authorities
-) {
+  private String langKey;
+
+  private String createdBy;
+
+  private Instant createdDate;
+
+  private String lastModifiedBy;
+
+  private Instant lastModifiedDate;
+
+  private Set<String> authorities;
+
+  public AdminUserDTO() {
+    // Empty constructor needed for Jackson.
+  }
+
   public AdminUserDTO(User user) {
-    this(user.getId(),
-      user.getLogin(),
-      user.getFirstName(),
-      user.getLastName(),
-      user.getEmail(),
-      user.isActivated(),
-      user.getLangKey(),
-      user.getCreatedBy(),
-      user.getCreatedDate(),
-      user.getLastModifiedBy(),
-      user.getLastModifiedDate(),
-      user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()));
+    this.id = user.getId();
+    this.login = user.getLogin();
+    this.firstName = user.getFirstName();
+    this.lastName = user.getLastName();
+    this.email = user.getEmail();
+    this.activated = user.isActivated();
+    this.langKey = user.getLangKey();
+    this.createdBy = user.getCreatedBy();
+    this.createdDate = user.getCreatedDate();
+    this.lastModifiedBy = user.getLastModifiedBy();
+    this.lastModifiedDate = user.getLastModifiedDate();
+    this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
   }
 }
