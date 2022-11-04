@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Authority {
+public class Authority extends AbstractAuditingEntity<Long>{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
