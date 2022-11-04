@@ -111,7 +111,6 @@ public class UserService {
     authorityRepository.findByName(AuthoritiesConstants.USER).ifPresent(authorities::add);
     newUser.setAuthorities(authorities);
     userRepository.save(newUser);
-    userRepository.save(newUser);
     log.debug("Created Information for User: {}", newUser);
     return newUser;
   }

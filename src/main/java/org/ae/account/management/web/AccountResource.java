@@ -64,7 +64,7 @@ public record AccountResource(
   @GetMapping("/activate")
   public void activateAccount(@RequestParam(value = "key") String key) {
     Optional<User> user = userService.activateRegistration(key);
-    if (!user.isPresent()) {
+    if (user.isEmpty()) {
       throw new AccountResourceException("No user was found for this activation key");
     }
   }
@@ -112,7 +112,7 @@ public record AccountResource(
       throw new EmailAlreadyUsedException();
     }
     Optional<User> user = userRepository.findByLogin(userLogin);
-    if (!user.isPresent()) {
+    if (user.isEmpty()) {
       throw new AccountResourceException("User could not be found");
     }
     userService.updateUser(
