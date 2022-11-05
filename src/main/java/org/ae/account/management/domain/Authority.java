@@ -19,4 +19,8 @@ public class Authority extends AbstractAuditingEntity<Long>{
   private Long id;
   @Column(nullable = false)
   private String name;
+
+  public Authority(String name) {
+    this.name = name;
+  }
 }
