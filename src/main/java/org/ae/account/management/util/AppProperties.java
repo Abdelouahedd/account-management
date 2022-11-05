@@ -15,7 +15,7 @@ public class AppProperties {
   @Data
   public static class Mail {
     private String baseUrl;
-
+    private String from;
   }
 
   @Data

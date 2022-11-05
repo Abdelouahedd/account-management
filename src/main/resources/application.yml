@@ -39,3 +39,4 @@ app:
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://127.0.0.1:8080
+    from: no-replay@ae.com

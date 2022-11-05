@@ -3,6 +3,7 @@ package org.ae.account.management.services;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.ae.account.management.domain.User;
+import org.ae.account.management.util.AppProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,13 +28,14 @@ public class MailService {
   private final JavaMailSender javaMailSender;
   private final MessageSource messageSource;
   private final SpringTemplateEngine templateEngine;
-
+  private final AppProperties appProperties;
   public MailService(JavaMailSender javaMailSender,
                      MessageSource messageSource,
-                     SpringTemplateEngine templateEngine) {
+                     SpringTemplateEngine templateEngine, AppProperties appProperties) {
     this.javaMailSender = javaMailSender;
     this.messageSource = messageSource;
     this.templateEngine = templateEngine;
+    this.appProperties = appProperties;
   }
 
   @Async
@@ -52,7 +54,7 @@ public class MailService {
     try {
       MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
       message.setTo(to);
-      message.setFrom("n-replay@server.com");
+      message.setFrom(appProperties.getMail().getFrom());
       message.setSubject(subject);
       message.setText(content, isHtml);
       javaMailSender.send(mimeMessage);
@@ -71,7 +73,7 @@ public class MailService {
     Locale locale = Locale.forLanguageTag(user.getLangKey());
     Context context = new Context(locale);
     context.setVariable(USER, user);
-    context.setVariable(BASE_URL, "http//localhost:8080");
+    context.setVariable(BASE_URL, appProperties.getMail().getBaseUrl());
     String content = templateEngine.process(templateName, context);
     String subject = messageSource.getMessage(titleKey, null, locale);
     sendEmail(user.getEmail(), subject, content, false, true);
